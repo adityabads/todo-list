@@ -1,17 +1,17 @@
 import React from "react";
 import Todo from "./Todo";
 
+import { connect } from "react-redux";
+import { addTodo, toggleTodo } from "../actions";
+
 class TodoList extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { todos: [] };
     this.input = "";
   }
 
   toggleTodo(id) {
-    const todos = this.state.todos.slice();
-    todos[id].completed = !todos[id].completed;
-    this.setState({ todos });
+    this.props.dispatch(toggleTodo(id));
   }
 
   render() {
@@ -24,16 +24,7 @@ class TodoList extends React.Component {
             if (!this.input.value.trim()) {
               return;
             }
-            this.setState({
-              todos: [
-                ...this.state.todos,
-                {
-                  id: this.state.todos.length,
-                  text: this.input.value,
-                  completed: false
-                }
-              ]
-            });
+            this.props.dispatch(addTodo(this.input.value));
             this.input.value = "";
           }}
         >
@@ -43,7 +34,7 @@ class TodoList extends React.Component {
 
         {/* This renders the actual todo list */}
         <ul>
-          {this.state.todos.map(todo => (
+          {this.props.todos.map(todo => (
             <Todo onClick={() => this.toggleTodo(todo.id)} {...todo} />
           ))}
         </ul>
@@ -52,4 +43,6 @@ class TodoList extends React.Component {
   }
 }
 
-export default TodoList;
+const mapStateToProps = state => ({ todos: state.todos });
+
+export default connect(mapStateToProps)(TodoList);
